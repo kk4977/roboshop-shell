@@ -4,6 +4,12 @@ instances=("mongodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipp
 domain_name="sivakumar.cloud"
 hosted_zone_id="Z057244718KAD90NZ6D6D"
 
+#!/bin/bash
+
+instances=("mongodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipping" "payment" "web")
+domain_name="sivakumar.cloud"
+hosted_zone_id="Z057244718KAD90NZ6D6D"
+
 for name in ${instances[@]}; do
     if [ $name == "shipping" ] || [ $name == "mysql" ]
     then
@@ -12,13 +18,17 @@ for name in ${instances[@]}; do
         instance_type="t3.micro"
     fi
     echo "Creating instance for: $name with instance type: $instance_type"
-    instance_id=$(aws ec2 run-instances --image-id ami-09c813fb71547fc4f instance_type $instance_type --security-group-ids sg-001ec7207734fe15c --subnet-id subnet-089d6d8109e6294d2 --query 'Instances[0].InstanceId' --output text)
-    echo "Instance created for: $name"
+    instance_id=$(aws ec2 run-instances --image-id ami-09c813fb71547fc4f --instance-type $instance_type --security-group-ids sg-001ec7207734fe15c --subnet-id subnet-089d6d8109e6294d2 --query 'Instances[0].InstanceId' --output text)
+    
+    if [ -z "$instance_id" ]; then
+        echo "Instance creation failed for: $name"
+        continue
+    fi
 
+    echo "Instance created for: $name with ID $instance_id"
     aws ec2 create-tags --resources $instance_id --tags Key=Name,Value=$name
 
-    if [ $name == "web" ]
-    then
+    if [ $name == "web" ]; then
         aws ec2 wait instance-running --instance-ids $instance_id
         public_ip=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[0].Instances[0].[PublicIpAddress]' --output text)
         ip_to_use=$public_ip
@@ -27,21 +37,20 @@ for name in ${instances[@]}; do
         ip_to_use=$private_ip
     fi
 
-    echo "creating R53 record for $name"
-    aws route53 change-resource-record-sets --hosted-zone-id $hosted_zone_id --change-batch '
+    echo "Creating R53 record for $name"
+    aws route53 change-resource-record-sets --hosted-zone-id $hosted_zone_id --change-batch "
     {
-        "Comment": "Creating a record set for '$name'"
-        ,"Changes": [{
-        "Action"              : "UPSERT"
-        ,"ResourceRecordSet"  : {
-            "Name"              : "'$name.$domain_name'"
-            ,"Type"             : "A"
-            ,"TTL"              : 1
-            ,"ResourceRecords"  : [{
-                "Value"         : "'$ip_to_use'"
-            }]
-        }
+        \"Comment\": \"Creating a record set for $name\",
+        \"Changes\": [{
+            \"Action\": \"UPSERT\",
+            \"ResourceRecordSet\": {
+                \"Name\": \"$name.$domain_name\",
+                \"Type\": \"A\",
+                \"TTL\": 1,
+                \"ResourceRecords\": [{
+                    \"Value\": \"$ip_to_use\"
+                }]
+            }
         }]
-    }'
-    
+    }"
 done
