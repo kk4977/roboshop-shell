@@ -18,7 +18,7 @@ for name in ${instances[@]}; do
         instance_type="t3.micro"
     fi
     echo "Creating instance for: $name with instance type: $instance_type"
-    instance_id=$(aws ec2 run-instances --image-id ami-09c813fb71547fc4f --instance-type $instance_type --security-group-ids sg-0313bc97dccfea8a3 --subnet-id subnet-0ee55092a6b276a22 --query 'Instances[0].InstanceId' --output text)
+    instance_id=$(aws ec2 run-instances --image-id ami-041e2ea9402c46c32 --instance-type $instance_type --security-group-ids sg-04f319eed37b2758e --subnet-id subnet-02fefb5d9b3631b6f --query 'Instances[0].InstanceId' --output text)
     
     if [ -z "$instance_id" ]; then
         echo "Instance creation failed for: $name"
