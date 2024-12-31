@@ -2,13 +2,13 @@
 
 instances=("mongodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipping" "payment" "web")
 domain_name="sivakumar.cloud"
-hosted_zone_id="Z057244718KAD90NZ6D6D"
+hosted_zone_id="Z092676436YRLO4PFIUP4"
 
 #!/bin/bash
 
 instances=("mongodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipping" "payment" "web")
 domain_name="sivakumar.cloud"
-hosted_zone_id="Z057244718KAD90NZ6D6D"
+hosted_zone_id="Z092676436YRLO4PFIUP4"
 
 for name in ${instances[@]}; do
     if [ $name == "shipping" ] || [ $name == "mysql" ]
@@ -18,7 +18,7 @@ for name in ${instances[@]}; do
         instance_type="t3.micro"
     fi
     echo "Creating instance for: $name with instance type: $instance_type"
-    instance_id=$(aws ec2 run-instances --image-id ami-09c813fb71547fc4f --instance-type $instance_type --security-group-ids sg-001ec7207734fe15c --subnet-id subnet-089d6d8109e6294d2 --query 'Instances[0].InstanceId' --output text)
+    instance_id=$(aws ec2 run-instances --image-id ami-09c813fb71547fc4f --instance-type $instance_type --security-group-ids sg-0313bc97dccfea8a3 --subnet-id subnet-0ee55092a6b276a22 --query 'Instances[0].InstanceId' --output text)
     
     if [ -z "$instance_id" ]; then
         echo "Instance creation failed for: $name"
