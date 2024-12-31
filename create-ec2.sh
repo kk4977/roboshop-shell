@@ -15,9 +15,9 @@ subnet_id="subnet-0a6c830ec2e8dfe11"        # Replace with your subnet ID
 for name in ${instances[@]}; do
     if [ $name == "shipping" ] || [ $name == "mysql" ]
     then
-        instance_type="t3.medium"
+        instance_type="t3.small"
     else
-        instance_type="t3.micro"
+        instance_type="t2.micro"
     fi
     echo "Creating instance for: $name with instance type: $instance_type"
 
