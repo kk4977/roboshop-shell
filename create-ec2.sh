@@ -17,7 +17,7 @@ for name in ${instances[@]}; do
     else
         instance_type="t3.micro"
     fi
-    echo "Creating instance for: $name with instance type: $instance_type"
+    echo "creating instance for: $name with instance type: $instance_type"
     instance_id=$(aws ec2 run-instances --image-id ami-09c813fb71547fc4f --instance-type $instance_type --security-group-ids subnet-0a6c830ec2e8dfe11 --subnet-id subnet-02fefb5d9b3631b6f --query 'Instances[0].InstanceId' --output text)
     
     if [ -z "$instance_id" ]; then
